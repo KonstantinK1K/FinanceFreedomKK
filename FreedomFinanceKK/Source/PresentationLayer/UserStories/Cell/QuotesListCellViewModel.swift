@@ -63,14 +63,14 @@ extension QuotesListCellViewModel: Equatable {
 // MARK: - Trades Info Model
 
 struct TradesViewModel {
-    let percentChange: Double
-    let lastTradePrice: Double
-    let priceChange: Double
+    let percentChange: Double?
+    let lastTradePrice: Double?
+    let priceChange: Double?
 
     init(data: QuoteDTO) {
-        self.percentChange = data.percentChange ?? 0
-        self.lastTradePrice = data.lastTradePrice ?? 0
-        self.priceChange = data.priceChange ?? 0
+        self.percentChange = data.percentChange
+        self.lastTradePrice = data.lastTradePrice
+        self.priceChange = data.priceChange
     }
 
     init(

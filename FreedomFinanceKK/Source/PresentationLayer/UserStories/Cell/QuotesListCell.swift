@@ -115,10 +115,17 @@ extension QuotesListCell {
     }
 
     func updateTradeInfo(updatedModel: TradesViewModel) {
+        guard
+            let percentChange = updatedModel.percentChange,
+            let lastTradePrice = updatedModel.lastTradePrice,
+            let priceChange = updatedModel.priceChange
+        else {
+            return
+        }
         percentChangeLabel.textColor = .white
-        percentChangeLabel.text = String(format: "%.3f%%", updatedModel.percentChange)
-        checkDifferenceForPercentChangeLabel(updatedModel.percentChange)
-        priceChangeLabel.text = "\(updatedModel.lastTradePrice) (\(updatedModel.priceChange))"
+        percentChangeLabel.text = String(format: "%.3f%%", percentChange)
+        checkDifferenceForPercentChangeLabel(percentChange)
+        priceChangeLabel.text = "\(lastTradePrice) (\(priceChange))"
         updateContainerConstraints()
     }
 
