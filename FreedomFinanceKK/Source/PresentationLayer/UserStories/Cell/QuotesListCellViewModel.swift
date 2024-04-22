@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Cell ViewModel
+
 struct QuotesListCellViewModel: Decodable {
     let ticker: String
     let percentChange: Double
@@ -55,6 +57,42 @@ extension QuotesListCellViewModel: Equatable {
         lhs.lastTradePrice == rhs.lastTradePrice &&
         lhs.priceChange == rhs.priceChange &&
         lhs.imageURL == rhs.imageURL
+    }
+}
+
+// MARK: - Trades Info Model
+
+struct TradesViewModel {
+    let percentChange: Double
+    let lastTradePrice: Double
+    let priceChange: Double
+
+    init(data: QuoteDTO) {
+        self.percentChange = data.percentChange ?? 0
+        self.lastTradePrice = data.lastTradePrice ?? 0
+        self.priceChange = data.priceChange ?? 0
+    }
+
+    init(
+        percentChange: Double,
+        lastTradePrice: Double,
+        priceChange: Double
+    ) {
+        self.percentChange = percentChange
+        self.lastTradePrice = lastTradePrice
+        self.priceChange = priceChange
+    }
+
+    static let initial = TradesViewModel(percentChange: 0, lastTradePrice: 0, priceChange: 0)
+}
+
+// MARK: - Equatable
+
+extension TradesViewModel: Equatable {
+    static func == (lhs: TradesViewModel, rhs: TradesViewModel) -> Bool {
+        return lhs.percentChange == rhs.percentChange &&
+        lhs.lastTradePrice == rhs.lastTradePrice &&
+        lhs.priceChange == rhs.priceChange
     }
 }
 

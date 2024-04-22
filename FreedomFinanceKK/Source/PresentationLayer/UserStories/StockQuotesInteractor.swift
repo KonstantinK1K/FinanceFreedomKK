@@ -19,7 +19,6 @@ protocol StockQuotesInteractorProtocol: AnyObject {
 }
 
 final class StockQuotesInteractor: StockQuotesInteractorProtocol {
-
     weak var delegate: StockQuotesInteractorDelegate?
     private let webSocketService: WebSocketServiceProtocol
 

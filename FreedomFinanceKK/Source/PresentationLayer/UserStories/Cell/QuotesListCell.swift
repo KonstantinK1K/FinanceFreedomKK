@@ -16,7 +16,15 @@ final class QuotesListCell: UITableViewCell {
 
     var viewModel: QuotesListCellViewModel = .initial {
         didSet {
-            updateViewModel(oldValue, viewModel)
+            guard viewModel != oldValue else { return }
+            setupViewModel(viewModel)
+        }
+    }
+
+    var tradesViewModel: TradesViewModel = .initial {
+        didSet {
+            guard tradesViewModel != oldValue else { return }
+            updateTradeInfo(updatedModel: tradesViewModel)
         }
     }
 
@@ -46,13 +54,13 @@ final class QuotesListCell: UITableViewCell {
 
     private lazy var fullNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize:  Constants.subtitleFontSize)
+        label.font = UIFont.systemFont(ofSize: Constants.subtitleFontSize)
         label.textAlignment = .left
         label.textColor = .systemGray2
         return label
     }()
 
-    private lazy var priceContainerView: UIView = {
+    private lazy var percentChangeContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         view.layer.cornerRadius = Constants.containerViewCornerRadius
@@ -72,7 +80,6 @@ final class QuotesListCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize:  Constants.subtitleFontSize)
         label.textAlignment = .right
-        label.textColor = .black
         return label
     }()
 
@@ -84,7 +91,6 @@ final class QuotesListCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        quoteImageView.image = nil
     }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -98,20 +104,27 @@ final class QuotesListCell: UITableViewCell {
 }
 
 extension QuotesListCell {
-    func updateViewModel(_ oldValue: QuotesListCellViewModel, _ newValue: QuotesListCellViewModel) {
-        shortNameLabel.text = newValue.ticker
-        fullNameLabel.text = "\(newValue.exchange) | \(newValue.securityName)"
-        percentChangeLabel.text = String(format: "%.3f%%", newValue.percentChange)
-        checkDifferenceForPercentChangeLabel(newValue.percentChange)
-        priceChangeLabel.text = "\(newValue.lastTradePrice) (\(newValue.priceChange ?? .zero))"
-        quoteImageView.url = newValue.imageURL
-        quoteImageView.isHidden = newValue.imageURL == nil
+    func setupViewModel(_ model: QuotesListCellViewModel) {
+        shortNameLabel.text = model.ticker
+        fullNameLabel.text = "\(model.exchange) | \(model.securityName)"
+        percentChangeLabel.text = String(format: "%.3f%%", model.percentChange)
+        checkDifferenceForPercentChangeLabel(model.percentChange)
+        priceChangeLabel.text = "\(model.lastTradePrice) (\(model.priceChange ?? .zero))"
+        quoteImageView.url = model.imageURL
+        updateContainerConstraints()
+    }
+
+    func updateTradeInfo(updatedModel: TradesViewModel) {
+        percentChangeLabel.textColor = .white
+        percentChangeLabel.text = String(format: "%.3f%%", updatedModel.percentChange)
+        checkDifferenceForPercentChangeLabel(updatedModel.percentChange)
+        priceChangeLabel.text = "\(updatedModel.lastTradePrice) (\(updatedModel.priceChange))"
         updateContainerConstraints()
     }
 
     private func updateContainerConstraints() {
         percentChangeLabel.sizeToFit()
-        priceContainerView.snp.updateConstraints {
+        percentChangeContainerView.snp.updateConstraints {
             $0.width.equalTo(percentChangeLabel.frame.width + Constants.containerWidthAdditionalSpaceSize)
         }
     }
@@ -157,15 +170,15 @@ private extension QuotesListCell {
     }
 
     func configurePriceLabelConstraints() {
-        contentView.addSubview(priceContainerView)
-        priceContainerView.snp.makeConstraints {
+        contentView.addSubview(percentChangeContainerView)
+        percentChangeContainerView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(Constants.containerViewTopInset)
             $0.trailing.equalTo(chevronImageView.snp.leading).offset(-Constants.containerViewTrailingOffset)
             $0.height.equalTo(Constants.shortNameHeight)
             $0.width.equalTo(Constants.containerViewInitialWidth)
         }
 
-        priceContainerView.addSubview(percentChangeLabel)
+        percentChangeContainerView.addSubview(percentChangeLabel)
         percentChangeLabel.snp.makeConstraints {
             $0.top.bottom.leading.trailing.equalToSuperview().inset(Constants.percentChangeLabelEdgesInset)
         }

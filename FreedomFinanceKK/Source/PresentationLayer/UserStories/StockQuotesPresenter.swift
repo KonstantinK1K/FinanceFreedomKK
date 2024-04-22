@@ -12,7 +12,6 @@ protocol StockQuotesPresenterProtocol: AnyObject {
 }
 
 final class StockQuotesPresenter {
-
     private var view: StockQuotesViewProtocol?
     private var interactor: StockQuotesInteractorProtocol?
 

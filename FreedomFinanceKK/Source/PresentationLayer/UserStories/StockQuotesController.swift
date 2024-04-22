@@ -26,7 +26,6 @@ final class StockQuotesController: UIViewController {
     private lazy var contentView: StockQuotesView = {
         let view = StockQuotesView()
         view.tableView.dataSource = self
-        view.tableView.delegate = self
         view.tableView.register(QuotesListCell.self, forCellReuseIdentifier: QuotesListCell.identifier)
         view.tableView.estimatedRowHeight = Constants.rowHeight
         return view
@@ -60,15 +59,20 @@ final class StockQuotesController: UIViewController {
 extension StockQuotesController: StockQuotesViewProtocol {
     func receivedQuotes(_ receivedQuote: QuoteDTO) {
         DispatchQueue.main.async {
-            if let index = self.quotesCollection.firstIndex(where: { $0.ticker == receivedQuote.ticker }) {
+            // Make a copy of the collection before using it in the closure
+            var quotesCopy = self.quotesCollection
+
+            if let index = quotesCopy.firstIndex(where: { $0.ticker == receivedQuote.ticker }) {
                 // If a quote with the same ticker exists, update it with receivedQuote
-                self.quotesCollection[index] = receivedQuote
-                let indexPath = IndexPath(row: index, section: .zero)
-                self.contentView.tableView.reloadRows(at: [indexPath], with: .automatic)
+                let indexPath = IndexPath(row: index, section: 0)
+                if let cell = self.contentView.tableView.cellForRow(at: indexPath) as? QuotesListCell {
+                    cell.tradesViewModel = .init(data: receivedQuote)
+                }
             } else {
                 // If no quote with the same ticker exists, append receivedQuote to quotesCollection
-                self.quotesCollection.append(receivedQuote)
-                let indexPath = IndexPath(row: self.quotesCollection.count - 1, section: .zero)
+                quotesCopy.append(receivedQuote)
+                self.quotesCollection = quotesCopy // Обновляем основную коллекцию
+                let indexPath = IndexPath(row: self.quotesCollection.count - 1, section: 0)
                 self.contentView.tableView.insertRows(at: [indexPath], with: .automatic)
             }
         }
@@ -106,17 +110,7 @@ extension StockQuotesController: UITableViewDataSource {
     }
 }
 
-// MARK: - UITableViewDelegate
-
-extension StockQuotesController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
-    }
-}
+// MARK: - Constants
 
 private extension StockQuotesController {
     enum Constants {
