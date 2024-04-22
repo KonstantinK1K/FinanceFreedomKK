@@ -105,21 +105,19 @@ extension QuotesListCell {
     func setupViewModel(_ model: QuotesListCellViewModel) {
         shortNameLabel.text = model.ticker
         fullNameLabel.text = "\(model.exchange) | \(model.securityName)"
-        percentChangeLabel.text = String(format: "%.3f%%", model.percentChange)
+        percentChangeLabel.text = String(format: "%.2f%%", model.percentChange)
         checkDifferenceForPercentChangeLabel(model.percentChange)
-        priceChangeLabel.text = "\(model.lastTradePrice) (\(model.priceChange ?? .zero))"
+        priceChangeLabel.text = "\(model.lastTradePrice) ( \(model.priceChange ?? .zero) )"
         quoteImageView.url = model.imageURL
         updateContainerConstraints()
     }
 
     func updateTradeInfo(updatedModel: TradesViewModel) {
         if let percentChange = updatedModel.percentChange {
-            percentChangeLabel.textColor = .white
-            percentChangeLabel.text = String(format: "%.3f%%", percentChange)
             checkDifferenceForPercentChangeLabel(percentChange)
         }
         if let lastTradePrice = updatedModel.lastTradePrice, let priceChange = updatedModel.priceChange{
-            priceChangeLabel.text = "\(lastTradePrice) (\(priceChange))"
+            priceChangeLabel.text = "\(lastTradePrice) ( \(priceChange) )"
         }
         updateContainerConstraints()
     }
@@ -261,13 +259,13 @@ private extension QuotesListCell {
         switch percent {
         case let value where value < .zero:
             color = .red
-            formattedPercent = String(format: "%.3f%%", percent)
+            formattedPercent = String(format: "%.2f%%", percent)
         case let value where value > .zero:
             color = .systemGreen
-            formattedPercent = String(format: "+%.3f%%", percent)
+            formattedPercent = String(format: "+%.2f%%", percent)
         default:
             color = .black
-            formattedPercent = String(format: "%.3f%%", percent)
+            formattedPercent = String(format: "%.2f%%", percent)
         }
 
         percentChangeLabel.text = formattedPercent
