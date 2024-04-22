@@ -16,14 +16,12 @@ final class QuotesListCell: UITableViewCell {
 
     var viewModel: QuotesListCellViewModel = .initial {
         didSet {
-            guard viewModel != oldValue else { return }
             setupViewModel(viewModel)
         }
     }
 
     var tradesViewModel: TradesViewModel = .initial {
         didSet {
-            guard tradesViewModel != oldValue else { return }
             updateTradeInfo(updatedModel: tradesViewModel)
         }
     }
@@ -115,17 +113,14 @@ extension QuotesListCell {
     }
 
     func updateTradeInfo(updatedModel: TradesViewModel) {
-        guard
-            let percentChange = updatedModel.percentChange,
-            let lastTradePrice = updatedModel.lastTradePrice,
-            let priceChange = updatedModel.priceChange
-        else {
-            return
+        if let percentChange = updatedModel.percentChange {
+            percentChangeLabel.textColor = .white
+            percentChangeLabel.text = String(format: "%.3f%%", percentChange)
+            checkDifferenceForPercentChangeLabel(percentChange)
         }
-        percentChangeLabel.textColor = .white
-        percentChangeLabel.text = String(format: "%.3f%%", percentChange)
-        checkDifferenceForPercentChangeLabel(percentChange)
-        priceChangeLabel.text = "\(lastTradePrice) (\(priceChange))"
+        if let lastTradePrice = updatedModel.lastTradePrice, let priceChange = updatedModel.priceChange{
+            priceChangeLabel.text = "\(lastTradePrice) (\(priceChange))"
+        }
         updateContainerConstraints()
     }
 
